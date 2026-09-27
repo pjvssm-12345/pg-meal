@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2F6B4F">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex, nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:; connect-src https://idowfsvjkbatqshkpimg.supabase.co; base-uri 'none'; form-action 'none'">
+<title>PG Meals</title>
+<style>
+  :root {
+    --leaf: #2F6B4F; --leaf-dark: #234F3B; --turmeric: #8F5E00; --turmeric-bg: #FBF1DC;
+    --bg: #F4F7F5; --card: #FFFFFF; --ink: #1D2622; --muted: #56645D; --line: #DCE3DF;
+    --red: #B3261E; --red-bg: #FCE8E4;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--ink);
+    font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", "Noto Sans Telugu", "Noto Sans Kannada",
+      "Noto Sans Devanagari", sans-serif; -webkit-text-size-adjust: 100%; }
+  main { max-width: 480px; margin: 0 auto; padding: 12px 16px 40px; }
+  h1 { font-size: 22px; margin: 8px 0 2px; }
+  .sub { color: var(--muted); margin: 0 0 16px; font-size: 15px; }
+  .langs { display: flex; gap: 6px; flex-wrap: wrap; margin: 0 0 6px; }
+  .langs button { min-height: 36px; padding: 0 12px; border-radius: 999px; background: #fff; color: var(--ink);
+    border: 1px solid var(--line); font-size: 14px; }
+  .langs button[aria-pressed="true"] { background: var(--leaf); color: #fff; border-color: var(--leaf); font-weight: 600; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; margin-bottom: 12px; }
+  .day-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 4px; }
+  .day-title { font-weight: 700; font-size: 17px; }
+  .pill { font-size: 13px; font-weight: 600; padding: 3px 10px; border-radius: 999px; white-space: nowrap; }
+  .pill.ok { background: #E3F1EA; color: var(--leaf-dark); }
+  .pill.wait { background: var(--turmeric-bg); color: var(--turmeric); }
+  .pill.lock { background: #EDF1EF; color: var(--muted); }
+  .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 52px; border-top: 1px solid #EDF1EF; }
+  .row:first-of-type { border-top: 0; }
+  .meal { font-size: 16px; }
+  .meal small { display: block; color: var(--muted); font-size: 13px; }
+  /* big, easy switch */
+  .sw { position: relative; width: 58px; height: 34px; flex: none; }
+  .sw input { opacity: 0; width: 100%; height: 100%; margin: 0; position: absolute; inset: 0; cursor: pointer; z-index: 1; }
+  .sw span { position: absolute; inset: 0; background: #C9D3CE; border-radius: 999px; transition: background .15s; }
+  .sw span::after { content: ""; position: absolute; top: 3px; left: 3px; width: 28px; height: 28px; background: #fff;
+    border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,.25); transition: transform .15s; }
+  .sw input:checked + span { background: var(--leaf); }
+  .sw input:checked + span::after { transform: translateX(24px); }
+  .sw input:disabled + span { opacity: .45; }
+  .sw input:focus-visible + span { outline: 3px solid #8FC1A8; outline-offset: 2px; }
+  button { font: inherit; border: 0; border-radius: 12px; min-height: 48px; padding: 0 16px; cursor: pointer; }
+  .btn { width: 100%; background: var(--leaf); color: #fff; font-weight: 600; font-size: 16px; padding: 10px 16px; }
+  .btn:disabled { opacity: .5; }
+  .btn.ghost { background: transparent; color: var(--leaf); border: 1.5px solid var(--leaf); }
+  .btn.done { background: #E3F1EA; color: var(--leaf-dark); }
+  .all { margin-top: 10px; }
+  label.f { display: block; font-weight: 600; margin: 14px 0 6px; }
+  select, input.t { width: 100%; font: inherit; font-size: 17px; min-height: 48px; padding: 0 12px; border: 1px solid #B8C4BE;
+    border-radius: 12px; background: #fff; color: var(--ink); }
+  input.t { letter-spacing: 6px; font-size: 22px; text-align: center; }
+  .msg { margin: 12px 0 0; padding: 10px 12px; border-radius: 10px; background: var(--red-bg); color: var(--red); font-size: 15px; }
+  .note { color: var(--muted); font-size: 14px; }
+  .tip { display: flex; gap: 12px; align-items: flex-start; border-radius: 14px; padding: 14px 16px; margin: 0 0 12px; }
+  .tip.daily { background: var(--turmeric-bg); border: 1px solid #F0DDB0; }
+  .tip.owner { background: #E3F1EA; border: 1px solid #BFDCCB; }
+  .tip .ico { font-size: 26px; line-height: 1; }
+  .tip b { display: block; font-size: 13px; letter-spacing: .3px; margin-bottom: 2px; }
+  .tip.daily b { color: var(--turmeric); }
+  .tip.owner b { color: var(--leaf-dark); }
+  .tip p { margin: 0; font-size: 16px; color: var(--ink); white-space: pre-line; }
+  .link { background: none; color: var(--muted); text-decoration: underline; min-height: 44px; padding: 0; font-size: 14px; }
+  .center { text-align: center; }
+  .toast { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); max-width: 92vw; background: #1D2622; color: #fff;
+    padding: 10px 16px; border-radius: 10px; font-size: 15px; opacity: 0; transition: opacity .2s; pointer-events: none; }
+  .toast.show { opacity: 1; }
+  .spinner { margin: 60px auto; width: 32px; height: 32px; border: 3px solid var(--line); border-top-color: var(--leaf);
+    border-radius: 50%; animation: spin .8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+<main id="app"><div class="spinner" aria-label="Loading"></div></main>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script>
+// ---- Settings (public values; the database checks every request) ----
+const SUPABASE_URL = 'https://idowfsvjkbatqshkpimg.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_sA1wWWN3V3OysXAKAqL3ug_95wyHYEX';
+
+// ---- Words in each language. {x} is filled in by the page. ----
+const LANGS = [['en', 'English'], ['te', 'తెలుగు'], ['kn', 'ಕನ್ನಡ'], ['hi', 'हिन्दी']];
+const T = {
+  en: {
+    welcome: 'Welcome 🙏',
+    firstTime: "First time on this phone? Tell us who you are. We'll remember you next time.",
+    yourRoom: 'Your room', chooseRoom: 'Choose room', yourBed: 'Your bed', chooseRoomFirst: 'Choose room first',
+    last4: 'Last 4 digits of your phone number', cont: 'Continue', checking: 'Checking…',
+    phoneSaved: 'Your phone number must be saved with your PG manager.',
+    fillAll: 'Choose your room and bed, and enter 4 digits.',
+    ground: 'Ground floor', floor: 'Floor {n}',
+    hi: 'Hi {name} 👋', room: 'Room',
+    howTo: 'Switch off meals you will skip, by {cutoff} the evening before.',
+    todaysNote: "Today's note", ownerNote: 'Message from your PG',
+    today: 'Today', locked: 'Locked', notStaying: 'Not staying', replied: 'Replied ✓', notReplied: 'Not replied yet',
+    breakfast: 'Breakfast', lunch: 'Lunch', dinner: 'Dinner', eating: 'Eating', skipping: 'Skipping',
+    allTap: 'Tap: I am eating all meals', allDone: '✓ Eating all meals', allBack: 'Change back: eating all meals',
+    notMe: 'Not {name}? Switch guest', saved: 'Saved ✓', thanks: 'Saved. Thank you!',
+    cantOpen: "Can't open meals", linkMissing: 'Meal link missing',
+    openFull: "Please open the full link from your PG's WhatsApp group.",
+    tips: [
+      ['🍛', 'Food cooked but not eaten goes to the bin. Switching off a meal you will skip takes just 2 seconds.'],
+      ['🌙', 'Eating out tomorrow? Tell the kitchen tonight so they cook just the right amount.'],
+      ['🏠', "Going home this weekend? Switch off those days' meals in advance. No plate wasted."],
+      ['👩‍🍳', "Our cook plans tomorrow's food from your replies tonight. Your one tap really counts."],
+      ['🌱', 'Less waste means fresher food for everyone. Thank you for keeping your meals updated!'],
+      ['⏰', 'Plans changed? You can update any meal until the evening before.'],
+      ['🙏', 'Every meal you skip without telling us is a full plate thrown away. Please let us know.'],
+      ['🥗', 'Accurate counts help the kitchen spend on better ingredients instead of wasted food.'],
+      ['🍚', 'A little rice or dal thrown away every day adds up to many kilos a month. Help us cook just right.'],
+      ['💚', 'When everyone updates their meals, nobody goes hungry and nothing goes to waste.'],
+    ],
+  },
+  te: {
+    welcome: 'స్వాగతం 🙏',
+    firstTime: 'ఈ ఫోన్‌లో మొదటిసారా? మీరు ఎవరో చెప్పండి. తర్వాతి సారి మేము గుర్తుంచుకుంటాం.',
+    yourRoom: 'మీ గది', chooseRoom: 'గది ఎంచుకోండి', yourBed: 'మీ బెడ్', chooseRoomFirst: 'ముందు గది ఎంచుకోండి',
+    last4: 'మీ ఫోన్ నంబర్ చివరి 4 అంకెలు', cont: 'కొనసాగించండి', checking: 'తనిఖీ చేస్తున్నాం…',
+    phoneSaved: 'మీ ఫోన్ నంబర్ PG మేనేజర్ వద్ద నమోదై ఉండాలి.',
+    fillAll: 'గది, బెడ్ ఎంచుకుని, 4 అంకెలు నమోదు చేయండి.',
+    ground: 'గ్రౌండ్ ఫ్లోర్', floor: 'ఫ్లోర్ {n}',
+    hi: 'నమస్తే {name} 👋', room: 'గది',
+    howTo: 'మీరు తినని భోజనాన్ని ముందు రోజు సాయంత్రం {cutoff} లోపు ఆఫ్ చేయండి.',
+    todaysNote: 'నేటి సందేశం', ownerNote: 'మీ PG నుండి సందేశం',
+    today: 'ఈరోజు', locked: 'లాక్ అయింది', notStaying: 'ఇక్కడ లేరు', replied: 'స్పందించారు ✓', notReplied: 'ఇంకా స్పందించలేదు',
+    breakfast: 'టిఫిన్', lunch: 'మధ్యాహ్న భోజనం', dinner: 'రాత్రి భోజనం', eating: 'తింటాను', skipping: 'తినను',
+    allTap: 'నొక్కండి: అన్ని భోజనాలు తింటాను', allDone: '✓ అన్ని భోజనాలు తింటాను', allBack: 'మార్చండి: అన్ని భోజనాలు తింటాను',
+    notMe: 'మీరు {name} కాదా? వేరే గెస్ట్ ఎంచుకోండి', saved: 'సేవ్ అయింది ✓', thanks: 'సేవ్ అయింది. ధన్యవాదాలు!',
+    cantOpen: 'భోజనం పేజీ తెరవలేకపోయాం', linkMissing: 'లింక్ అసంపూర్ణంగా ఉంది',
+    openFull: 'దయచేసి మీ PG WhatsApp గ్రూప్ నుండి పూర్తి లింక్ తెరవండి.',
+    tips: [
+      ['🍛', 'వండిన భోజనం ఎవరూ తినకపోతే చెత్తలోకి పోతుంది. మీరు తినని భోజనాన్ని ఆఫ్ చేయడానికి కేవలం 2 సెకన్లు చాలు.'],
+      ['🌙', 'రేపు బయట తింటున్నారా? ఈ రాత్రే కిచెన్‌కు చెప్పండి, అవసరమైనంతే వండుతారు.'],
+      ['🏠', 'ఈ వీకెండ్ ఇంటికి వెళ్తున్నారా? ఆ రోజుల భోజనాన్ని ముందుగానే ఆఫ్ చేయండి. ఒక్క ప్లేట్ కూడా వృథా కాదు.'],
+      ['👩‍🍳', 'మా వంటవారు ఈ రాత్రి మీ సమాధానాల ఆధారంగా రేపటి వంట ప్లాన్ చేస్తారు. మీ ఒక్క టాప్ చాలా ముఖ్యం.'],
+      ['🌱', 'తక్కువ వృథా అంటే అందరికీ తాజా భోజనం. మీ భోజన వివరాలు అప్‌డేట్ చేస్తున్నందుకు ధన్యవాదాలు!'],
+      ['⏰', 'ప్లాన్ మారిందా? ముందు రోజు సాయంత్రం వరకు ఏ భోజనాన్నైనా మార్చవచ్చు.'],
+      ['🙏', 'చెప్పకుండా వదిలేసిన ప్రతి భోజనం ఒక పూర్తి ప్లేట్ వృథా. దయచేసి మాకు తెలియజేయండి.'],
+      ['🥗', 'సరైన లెక్కతో కిచెన్ డబ్బు వృథా భోజనంపై కాకుండా మంచి సరుకులపై ఖర్చవుతుంది.'],
+      ['🍚', 'రోజూ కొంచెం అన్నం లేదా పప్పు పారేస్తే, నెలకు ఎన్నో కిలోలు అవుతుంది. సరిపడా వండటానికి సహాయం చేయండి.'],
+      ['💚', 'అందరూ భోజన వివరాలు అప్‌డేట్ చేస్తే, ఎవరూ ఆకలితో ఉండరు, ఏదీ వృథా కాదు.'],
+    ],
+  },
+  kn: {
+    welcome: 'ಸ್ವಾಗತ 🙏',
+    firstTime: 'ಈ ಫೋನ್‌ನಲ್ಲಿ ಮೊದಲ ಬಾರಿಯೇ? ನೀವು ಯಾರೆಂದು ತಿಳಿಸಿ. ಮುಂದಿನ ಬಾರಿ ನಾವು ನೆನಪಿಟ್ಟುಕೊಳ್ಳುತ್ತೇವೆ.',
+    yourRoom: 'ನಿಮ್ಮ ಕೊಠಡಿ', chooseRoom: 'ಕೊಠಡಿ ಆಯ್ಕೆಮಾಡಿ', yourBed: 'ನಿಮ್ಮ ಬೆಡ್', chooseRoomFirst: 'ಮೊದಲು ಕೊಠಡಿ ಆಯ್ಕೆಮಾಡಿ',
+    last4: 'ನಿಮ್ಮ ಫೋನ್ ಸಂಖ್ಯೆಯ ಕೊನೆಯ 4 ಅಂಕೆಗಳು', cont: 'ಮುಂದುವರಿಸಿ', checking: 'ಪರಿಶೀಲಿಸಲಾಗುತ್ತಿದೆ…',
+    phoneSaved: 'ನಿಮ್ಮ ಫೋನ್ ಸಂಖ್ಯೆ PG ಮ್ಯಾನೇಜರ್ ಬಳಿ ದಾಖಲಾಗಿರಬೇಕು.',
+    fillAll: 'ಕೊಠಡಿ ಮತ್ತು ಬೆಡ್ ಆಯ್ಕೆಮಾಡಿ, 4 ಅಂಕೆಗಳನ್ನು ನಮೂದಿಸಿ.',
+    ground: 'ನೆಲ ಮಹಡಿ', floor: 'ಮಹಡಿ {n}',
+    hi: 'ನಮಸ್ಕಾರ {name} 👋', room: 'ಕೊಠಡಿ',
+    howTo: 'ನೀವು ಬಿಡುವ ಊಟವನ್ನು ಹಿಂದಿನ ದಿನ ಸಂಜೆ {cutoff} ಒಳಗೆ ಆಫ್ ಮಾಡಿ.',
+    todaysNote: 'ಇಂದಿನ ಸಂದೇಶ', ownerNote: 'ನಿಮ್ಮ PG ಯಿಂದ ಸಂದೇಶ',
+    today: 'ಇಂದು', locked: 'ಲಾಕ್ ಆಗಿದೆ', notStaying: 'ಇಲ್ಲಿ ಇರುವುದಿಲ್ಲ', replied: 'ಉತ್ತರಿಸಿದ್ದೀರಿ ✓', notReplied: 'ಇನ್ನೂ ಉತ್ತರಿಸಿಲ್ಲ',
+    breakfast: 'ತಿಂಡಿ', lunch: 'ಮಧ್ಯಾಹ್ನದ ಊಟ', dinner: 'ರಾತ್ರಿ ಊಟ', eating: 'ಬೇಕು', skipping: 'ಬೇಡ',
+    allTap: 'ಒತ್ತಿ: ಎಲ್ಲಾ ಊಟ ಬೇಕು', allDone: '✓ ಎಲ್ಲಾ ಊಟ ಬೇಕು', allBack: 'ಬದಲಿಸಿ: ಎಲ್ಲಾ ಊಟ ಬೇಕು',
+    notMe: 'ನೀವು {name} ಅಲ್ಲವೇ? ಬೇರೆ ಗೆಸ್ಟ್ ಆಯ್ಕೆಮಾಡಿ', saved: 'ಉಳಿಸಲಾಗಿದೆ ✓', thanks: 'ಉಳಿಸಲಾಗಿದೆ. ಧನ್ಯವಾದಗಳು!',
+    cantOpen: 'ಊಟದ ಪುಟ ತೆರೆಯಲಾಗಲಿಲ್ಲ', linkMissing: 'ಲಿಂಕ್ ಅಪೂರ್ಣವಾಗಿದೆ',
+    openFull: 'ದಯವಿಟ್ಟು ನಿಮ್ಮ PG WhatsApp ಗುಂಪಿನಿಂದ ಪೂರ್ಣ ಲಿಂಕ್ ತೆರೆಯಿರಿ.',
+    tips: [
+      ['🍛', 'ಬೇಯಿಸಿದ ಆಹಾರವನ್ನು ಯಾರೂ ತಿನ್ನದಿದ್ದರೆ ಕಸಕ್ಕೆ ಹೋಗುತ್ತದೆ. ನೀವು ಬಿಡುವ ಊಟವನ್ನು ಆಫ್ ಮಾಡಲು ಕೇವಲ 2 ಸೆಕೆಂಡು ಸಾಕು.'],
+      ['🌙', 'ನಾಳೆ ಹೊರಗೆ ಊಟ ಮಾಡುತ್ತೀರಾ? ಇಂದು ರಾತ್ರಿಯೇ ಅಡುಗೆಮನೆಗೆ ತಿಳಿಸಿ, ಬೇಕಾದಷ್ಟೇ ಅಡುಗೆ ಮಾಡುತ್ತಾರೆ.'],
+      ['🏠', 'ಈ ವೀಕೆಂಡ್ ಊರಿಗೆ ಹೋಗುತ್ತಿದ್ದೀರಾ? ಆ ದಿನಗಳ ಊಟವನ್ನು ಮುಂಚಿತವಾಗಿ ಆಫ್ ಮಾಡಿ. ಒಂದೂ ತಟ್ಟೆ ವ್ಯರ್ಥವಾಗುವುದಿಲ್ಲ.'],
+      ['👩‍🍳', 'ನಮ್ಮ ಅಡುಗೆಯವರು ಇಂದು ರಾತ್ರಿಯ ನಿಮ್ಮ ಉತ್ತರಗಳ ಆಧಾರದ ಮೇಲೆ ನಾಳೆಯ ಅಡುಗೆ ಯೋಜಿಸುತ್ತಾರೆ. ನಿಮ್ಮ ಒಂದು ಟ್ಯಾಪ್ ತುಂಬಾ ಮುಖ್ಯ.'],
+      ['🌱', 'ಕಡಿಮೆ ವ್ಯರ್ಥ ಎಂದರೆ ಎಲ್ಲರಿಗೂ ತಾಜಾ ಆಹಾರ. ನಿಮ್ಮ ಊಟದ ವಿವರಗಳನ್ನು ಅಪ್‌ಡೇಟ್ ಮಾಡುತ್ತಿರುವುದಕ್ಕೆ ಧನ್ಯವಾದಗಳು!'],
+      ['⏰', 'ಯೋಜನೆ ಬದಲಾಯಿತೇ? ಹಿಂದಿನ ದಿನ ಸಂಜೆಯವರೆಗೆ ಯಾವುದೇ ಊಟವನ್ನು ಬದಲಿಸಬಹುದು.'],
+      ['🙏', 'ತಿಳಿಸದೆ ಬಿಟ್ಟ ಪ್ರತಿಯೊಂದು ಊಟವೂ ಒಂದು ಪೂರ್ಣ ತಟ್ಟೆಯ ವ್ಯರ್ಥ. ದಯವಿಟ್ಟು ನಮಗೆ ತಿಳಿಸಿ.'],
+      ['🥗', 'ಸರಿಯಾದ ಲೆಕ್ಕದಿಂದ ಅಡುಗೆಮನೆಯ ಹಣ ವ್ಯರ್ಥ ಆಹಾರಕ್ಕಲ್ಲ, ಉತ್ತಮ ಸಾಮಗ್ರಿಗಳಿಗೆ ಖರ್ಚಾಗುತ್ತದೆ.'],
+      ['🍚', 'ಪ್ರತಿದಿನ ಸ್ವಲ್ಪ ಅನ್ನ ಅಥವಾ ಬೇಳೆ ಎಸೆದರೆ, ತಿಂಗಳಿಗೆ ಹಲವು ಕಿಲೋ ಆಗುತ್ತದೆ. ಸರಿಯಾದ ಪ್ರಮಾಣದಲ್ಲಿ ಅಡುಗೆ ಮಾಡಲು ಸಹಾಯ ಮಾಡಿ.'],
+      ['💚', 'ಎಲ್ಲರೂ ತಮ್ಮ ಊಟದ ವಿವರ ಅಪ್‌ಡೇಟ್ ಮಾಡಿದರೆ, ಯಾರೂ ಹಸಿದಿರುವುದಿಲ್ಲ, ಏನೂ ವ್ಯರ್ಥವಾಗುವುದಿಲ್ಲ.'],
+    ],
+  },
+  hi: {
+    welcome: 'स्वागत है 🙏',
+    firstTime: 'इस फ़ोन पर पहली बार? बताइए आप कौन हैं। अगली बार हम आपको याद रखेंगे।',
+    yourRoom: 'आपका कमरा', chooseRoom: 'कमरा चुनें', yourBed: 'आपका बेड', chooseRoomFirst: 'पहले कमरा चुनें',
+    last4: 'आपके फ़ोन नंबर के आख़िरी 4 अंक', cont: 'आगे बढ़ें', checking: 'जाँच हो रही है…',
+    phoneSaved: 'आपका फ़ोन नंबर PG मैनेजर के पास दर्ज होना चाहिए।',
+    fillAll: 'कमरा और बेड चुनें, और 4 अंक डालें।',
+    ground: 'ग्राउंड फ़्लोर', floor: 'फ़्लोर {n}',
+    hi: 'नमस्ते {name} 👋', room: 'कमरा',
+    howTo: 'जो खाना आप नहीं खाएँगे, उसे एक दिन पहले शाम {cutoff} तक बंद कर दें।',
+    todaysNote: 'आज का संदेश', ownerNote: 'आपके PG की ओर से संदेश',
+    today: 'आज', locked: 'बंद', notStaying: 'यहाँ नहीं हैं', replied: 'जवाब दिया ✓', notReplied: 'अभी जवाब नहीं दिया',
+    breakfast: 'नाश्ता', lunch: 'दोपहर का खाना', dinner: 'रात का खाना', eating: 'खाएँगे', skipping: 'नहीं खाएँगे',
+    allTap: 'टैप करें: सभी भोजन चाहिए', allDone: '✓ सभी भोजन चाहिए', allBack: 'बदलें: सभी भोजन चाहिए',
+    notMe: '{name} नहीं हैं? दूसरा गेस्ट चुनें', saved: 'सेव हो गया ✓', thanks: 'सेव हो गया। धन्यवाद!',
+    cantOpen: 'भोजन पेज नहीं खुला', linkMissing: 'लिंक अधूरा है',
+    openFull: 'कृपया अपने PG के WhatsApp ग्रुप से पूरा लिंक खोलें।',
+    tips: [
+      ['🍛', 'बना हुआ खाना जो कोई नहीं खाता, कूड़े में जाता है। जो भोजन आप नहीं खाएँगे, उसे बंद करने में सिर्फ़ 2 सेकंड लगते हैं।'],
+      ['🌙', 'कल बाहर खाना है? आज रात ही किचन को बता दें, ताकि उतना ही खाना बने जितना चाहिए।'],
+      ['🏠', 'इस वीकेंड घर जा रहे हैं? उन दिनों का खाना पहले से बंद कर दें। एक भी थाली बर्बाद नहीं होगी।'],
+      ['👩‍🍳', 'हमारे कुक आज रात आपके जवाब देखकर कल का खाना तय करते हैं। आपका एक टैप सच में मायने रखता है।'],
+      ['🌱', 'कम बर्बादी यानी सबके लिए ताज़ा खाना। अपना भोजन अपडेट रखने के लिए धन्यवाद!'],
+      ['⏰', 'प्लान बदल गया? आप एक दिन पहले शाम तक कोई भी भोजन बदल सकते हैं।'],
+      ['🙏', 'बिना बताए छोड़ा गया हर भोजन एक पूरी थाली की बर्बादी है। कृपया हमें बताएँ।'],
+      ['🥗', 'सही गिनती से किचन का पैसा बर्बाद खाने पर नहीं, बेहतर सामग्री पर खर्च होता है।'],
+      ['🍚', 'रोज़ थोड़ा-सा चावल या दाल फेंकना, महीने में कई किलो बन जाता है। सही मात्रा में खाना बनाने में मदद करें।'],
+      ['💚', 'जब सब अपना भोजन अपडेट करते हैं, तो न कोई भूखा रहता है, न खाना बर्बाद होता है।'],
+    ],
+  },
+};
+const LOCALE = { en: 'en-IN', te: 'te-IN', kn: 'kn-IN', hi: 'hi-IN' };
+
+const app = document.getElementById('app');
+const link = new URLSearchParams(location.search).get('p') || '';
+const storeKey = 'pgmeal_' + link;
+
+function store(k, v) { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch (e) {} }
+function read(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+
+// Language: saved choice, else the phone's language, else English.
+let lang = read('pgmeal_lang');
+if (!T[lang]) {
+  const nav = (navigator.languages || [navigator.language || 'en']).map(l => String(l).slice(0, 2));
+  lang = nav.find(l => T[l]) || 'en';
+}
+function t(key, vars) {
+  let s = (T[lang] && T[lang][key]) ?? T.en[key] ?? key;
+  if (vars) for (const [k, v] of Object.entries(vars)) s = s.replace('{' + k + '}', v);
+  return s;
+}
+
+// A random ID for this phone, so wrong tries lock only this phone (not the real guest's).
+let deviceId = read('pgmeal_device');
+if (!deviceId) {
+  deviceId = (crypto.randomUUID ? crypto.randomUUID() : String(Math.random()).slice(2) + Date.now());
+  store('pgmeal_device', deviceId);
+}
+
+let memToken = null; // fallback when the browser blocks storage
+const token = () => read(storeKey) || memToken;
+function setToken(v) { store(storeKey, v); memToken = v; }
+
+async function rpc(fn, body) {
+  const r = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${fn}`, {
+    method: 'POST',
+    headers: { apikey: SUPABASE_KEY, 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  const text = await r.text();
+  const data = text ? JSON.parse(text) : null;
+  if (!r.ok) throw new Error((data && data.message) || 'Could not reach the server. Check your internet and try again.');
+  return data;
+}
+
+function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+function dayName(iso, isToday) {
+  const [y, m, d] = iso.split('-').map(Number);
+  const dt = new Date(y, m - 1, d);
+  const loc = LOCALE[lang] || 'en-IN';
+  const dm = dt.toLocaleDateString(loc, { day: 'numeric', month: 'short' });
+  return isToday ? `${t('today')}, ${dm}` : dt.toLocaleDateString(loc, { weekday: 'short', day: 'numeric', month: 'short' });
+}
+let toastTimer;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove('show'), 2600);
+}
+
+function langBar() {
+  return `<nav class="langs" aria-label="Language">${LANGS.map(([code, name]) =>
+    `<button type="button" data-lang="${code}" aria-pressed="${code === lang}" lang="${code}">${name}</button>`).join('')}</nav>`;
+}
+function wireLangBar(rerender) {
+  app.querySelectorAll('button[data-lang]').forEach(b => b.onclick = () => {
+    lang = b.dataset.lang; store('pgmeal_lang', lang); document.documentElement.lang = lang; rerender();
+  });
+}
+document.documentElement.lang = lang;
+
+// A different "don't waste food" note every day (same note for everyone on the same day).
+function todayTip() {
+  const now = new Date();
+  const dayNo = Math.floor(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) / 86400000);
+  const tips = t('tips');
+  const [ico, text] = tips[dayNo % tips.length];
+  return `<div class="tip daily" role="note"><div class="ico" aria-hidden="true">${ico}</div>
+    <div><b>${t('todaysNote')}</b><p>${esc(text)}</p></div></div>`;
+}
+function ownerTip(note) {
+  if (!note) return '';
+  return `<div class="tip owner" role="note"><div class="ico" aria-hidden="true">📢</div>
+    <div><b>${t('ownerNote')}</b><p>${esc(note)}</p></div></div>`;
+}
+
+// ---------- Step 1: who are you? ----------
+let loginData = null; // { rooms, note, message }
+async function showLogin(message) {
+  if (!link) {
+    app.innerHTML = `${langBar()}<h1>${t('linkMissing')}</h1><p class="sub">${t('openFull')}</p>`;
+    wireLangBar(() => showLogin(message)); return;
+  }
+  if (!loginData) {
+    app.innerHTML = '<div class="spinner" aria-label="Loading"></div>';
+    try {
+      const [rooms, info] = await Promise.all([rpc('vote_rooms', { p_link: link }), rpc('vote_note', { p_link: link })]);
+      loginData = { rooms, note: info && info.note };
+    } catch (e) {
+      app.innerHTML = `${langBar()}<h1>${t('cantOpen')}</h1><div class="msg">${esc(e.message)}</div>`;
+      wireLangBar(() => showLogin(message)); return;
+    }
+  }
+  renderLogin(message);
+}
+
+function renderLogin(message, keep) {
+  const byRoom = {};
+  loginData.rooms.forEach(r => { (byRoom[r.room_no] ||= { floor: r.floor, beds: [] }).beds.push(r.bed_label); });
+  const floors = {};
+  Object.entries(byRoom).forEach(([no, v]) => { (floors[v.floor] ||= []).push(no); });
+  const roomOptions = Object.keys(floors).sort((a, b) => a - b).map(f =>
+    `<optgroup label="${f == 0 ? t('ground') : t('floor', { n: f })}">${floors[f].map(no => `<option>${esc(no)}</option>`).join('')}</optgroup>`
+  ).join('');
+  app.innerHTML = `
+    ${langBar()}
+    <h1>${t('welcome')}</h1>
+    <p class="sub">${t('firstTime')}</p>
+    ${ownerTip(loginData.note)}
+    ${todayTip()}
+    <div class="card">
+      <label class="f" for="room">${t('yourRoom')}</label>
+      <select id="room"><option value="">${t('chooseRoom')}</option>${roomOptions}</select>
+      <label class="f" for="bed">${t('yourBed')}</label>
+      <select id="bed" disabled><option value="">${t('chooseRoomFirst')}</option></select>
+      <label class="f" for="l4">${t('last4')}</label>
+      <input id="l4" class="t" inputmode="numeric" autocomplete="off" maxlength="4" placeholder="••••">
+      <div id="lmsg">${message ? `<div class="msg">${esc(message)}</div>` : ''}</div>
+      <button id="go" class="btn all">${t('cont')}</button>
+    </div>
+    <p class="note">${t('phoneSaved')}</p>`;
+  const roomEl = document.getElementById('room'), bedEl = document.getElementById('bed'), l4El = document.getElementById('l4');
+  const fillBeds = () => {
+    const r = byRoom[roomEl.value];
+    bedEl.disabled = !r;
+    bedEl.innerHTML = r ? r.beds.map(b => `<option>${esc(b)}</option>`).join('') : `<option value="">${t('chooseRoomFirst')}</option>`;
+  };
+  roomEl.onchange = fillBeds;
+  if (keep) { roomEl.value = keep.room; fillBeds(); bedEl.value = keep.bed; l4El.value = keep.l4; }
+  wireLangBar(() => renderLogin(message, { room: roomEl.value, bed: bedEl.value, l4: l4El.value }));
+  document.getElementById('go').onclick = async () => {
+    const l4 = l4El.value.replace(/\D/g, '');
+    const lmsg = document.getElementById('lmsg');
+    if (!roomEl.value || !bedEl.value || l4.length !== 4) {
+      lmsg.innerHTML = `<div class="msg">${t('fillAll')}</div>`; return;
+    }
+    const btn = document.getElementById('go'); btn.disabled = true; btn.textContent = t('checking');
+    try {
+      const res = await rpc('vote_login', { p_link: link, p_room: roomEl.value, p_bed: bedEl.value, p_last4: l4, p_device: deviceId });
+      if (!res.ok) { lmsg.innerHTML = `<div class="msg">${esc(res.message)}</div>`; btn.disabled = false; btn.textContent = t('cont'); return; }
+      setToken(res.token);
+      await showMeals();
+    } catch (e) { lmsg.innerHTML = `<div class="msg">${esc(e.message)}</div>`; btn.disabled = false; btn.textContent = t('cont'); }
+  };
+}
+
+// ---------- Step 2: meals ----------
+let state = null;
+async function showMeals() {
+  if (!token()) return showLogin();
+  if (!state) app.innerHTML = '<div class="spinner" aria-label="Loading"></div>';
+  try { state = await rpc('vote_get', { p_token: token() }); }
+  catch (e) { setToken(null); state = null; return showLogin(e.message); }
+  render();
+}
+
+function render() {
+  const s = state;
+  const days = s.days.map(d => {
+    const pill = !d.staying ? `<span class="pill lock">${t('notStaying')}</span>`
+      : d.is_today || !d.open ? `<span class="pill lock">${t('locked')}</span>`
+      : d.replied ? `<span class="pill ok">${t('replied')}</span>`
+      : `<span class="pill wait">${t('notReplied')}</span>`;
+    const canEdit = d.staying && d.open && !d.is_today;
+    const rows = d.meals.map(m => `
+      <div class="row">
+        <div class="meal">${t(m.meal)}<small>${m.eating ? t('eating') : t('skipping')}</small></div>
+        <label class="sw" aria-label="${t(m.meal)}, ${dayName(d.date, d.is_today)}">
+          <input type="checkbox" data-date="${d.date}" data-meal="${m.meal}" ${m.eating ? 'checked' : ''} ${canEdit ? '' : 'disabled'}>
+          <span></span>
+        </label>
+      </div>`).join('');
+    const allEating = d.meals.every(m => m.eating);
+    const allBtn = !canEdit ? ''
+      : d.replied && allEating ? `<button class="btn all done" data-all="${d.date}">${t('allDone')}</button>`
+      : !allEating ? `<button class="btn all ghost" data-all="${d.date}">${t('allBack')}</button>`
+      : `<button class="btn all" data-all="${d.date}">${t('allTap')}</button>`;
+    return `<section class="card" aria-label="${dayName(d.date, d.is_today)}">
+      <div class="day-head"><div class="day-title">${dayName(d.date, d.is_today)}</div>${pill}</div>
+      ${rows}${allBtn}</section>`;
+  }).join('');
+  app.innerHTML = `
+    ${langBar()}
+    <h1>${t('hi', { name: esc(s.name) })}</h1>
+    <p class="sub">${esc(s.pg_name)} · ${t('room')} ${esc(s.room)}-${esc(s.bed)}<br>
+      ${t('howTo', { cutoff: `<b>${esc(s.cutoff)}</b>` })}</p>
+    ${ownerTip(s.note)}
+    ${todayTip()}
+    ${days}
+    <p class="center"><button class="link" id="notme">${t('notMe', { name: esc(s.name) })}</button></p>`;
+  wireLangBar(render);
+
+  app.querySelectorAll('input[type=checkbox]').forEach(el => el.onchange = async () => {
+    const eating = el.checked;
+    el.disabled = true;
+    try {
+      state = await rpc('vote_set', { p_token: token(), p_date: el.dataset.date, p_meal: el.dataset.meal, p_eating: eating });
+      render();
+      toast(t('saved'));
+    } catch (e) { el.checked = !eating; el.disabled = false; toast(e.message); }
+  });
+  app.querySelectorAll('button[data-all]').forEach(btn => btn.onclick = async () => {
+    btn.disabled = true;
+    try {
+      state = await rpc('vote_all', { p_token: token(), p_date: btn.dataset.all });
+      render();
+      toast(t('thanks'));
+    } catch (e) { btn.disabled = false; toast(e.message); }
+  });
+  document.getElementById('notme').onclick = async () => {
+    try { await rpc('vote_logout', { p_token: token() }); } catch (e) {}
+    setToken(null); state = null; loginData = null; showLogin();
+  };
+}
+
+showMeals();
+</script>
+</body>
+</html>
