@@ -100,6 +100,9 @@ const SUPABASE_KEY = 'sb_publishable_sA1wWWN3V3OysXAKAqL3ug_95wyHYEX';
 const LANGS = [['en', 'English'], ['te', 'తెలుగు'], ['kn', 'ಕನ್ನಡ'], ['hi', 'हिन्दी']];
 const T = {
   en: {
+    phoneVerified: 'Your phone is verified ✓', reportOff: 'Reporting is turned off for you. Please talk to your PG manager.',
+    needLink: 'To report a problem, open the personal link your PG manager sent you on WhatsApp. If you did not get it, ask them to send it.',
+    useLinkTitle: 'Open your personal link', useLink: 'Please open the personal link your PG manager sent you on WhatsApp. If you did not get it, ask them to send it.',
     addPhoto: '📷 Add a photo (optional)', photoAdded: 'Photo added ✓', removePhoto: 'Remove photo',
     photoFail: 'Photo could not be sent. Try again or send without the photo.', st_not_real: 'Not a real problem',
     probTitle: 'Problem in your room?', probHelp: 'Tell the PG manager. Choose what is wrong:',
@@ -139,6 +142,9 @@ const T = {
     ],
   },
   te: {
+    phoneVerified: 'మీ ఫోన్ ధృవీకరించబడింది ✓', reportOff: 'మీకు ఫిర్యాదు చేసే సౌకర్యం ఆపివేయబడింది. దయచేసి మీ PG మేనేజర్‌తో మాట్లాడండి.',
+    needLink: 'సమస్య తెలియజేయడానికి, మీ PG మేనేజర్ WhatsApp లో పంపిన మీ వ్యక్తిగత లింక్‌ను తెరవండి. మీకు రాకపోతే, పంపమని వారిని అడగండి.',
+    useLinkTitle: 'మీ వ్యక్తిగత లింక్ తెరవండి', useLink: 'దయచేసి మీ PG మేనేజర్ WhatsApp లో పంపిన మీ వ్యక్తిగత లింక్‌ను తెరవండి. మీకు రాకపోతే, పంపమని వారిని అడగండి.',
     addPhoto: '📷 ఫోటో జోడించండి (ఐచ్ఛికం)', photoAdded: 'ఫోటో జోడించారు ✓', removePhoto: 'ఫోటో తీసివేయండి',
     photoFail: 'ఫోటో పంపలేకపోయాం. మళ్లీ ప్రయత్నించండి లేదా ఫోటో లేకుండా పంపండి.', st_not_real: 'నిజమైన సమస్య కాదు',
     probTitle: 'మీ గదిలో సమస్య ఉందా?', probHelp: 'PG మేనేజర్‌కు తెలియజేయండి. ఏమి సమస్యో ఎంచుకోండి:',
@@ -178,6 +184,9 @@ const T = {
     ],
   },
   kn: {
+    phoneVerified: 'ನಿಮ್ಮ ಫೋನ್ ದೃಢೀಕರಿಸಲಾಗಿದೆ ✓', reportOff: 'ನಿಮಗೆ ದೂರು ನೀಡುವುದನ್ನು ನಿಲ್ಲಿಸಲಾಗಿದೆ. ದಯವಿಟ್ಟು ನಿಮ್ಮ PG ಮ್ಯಾನೇಜರ್ ಜೊತೆ ಮಾತನಾಡಿ.',
+    needLink: 'ಸಮಸ್ಯೆ ತಿಳಿಸಲು, ನಿಮ್ಮ PG ಮ್ಯಾನೇಜರ್ WhatsApp ನಲ್ಲಿ ಕಳುಹಿಸಿದ ನಿಮ್ಮ ವೈಯಕ್ತಿಕ ಲಿಂಕ್ ತೆರೆಯಿರಿ. ಬಂದಿಲ್ಲದಿದ್ದರೆ, ಕಳುಹಿಸಲು ಅವರನ್ನು ಕೇಳಿ.',
+    useLinkTitle: 'ನಿಮ್ಮ ವೈಯಕ್ತಿಕ ಲಿಂಕ್ ತೆರೆಯಿರಿ', useLink: 'ದಯವಿಟ್ಟು ನಿಮ್ಮ PG ಮ್ಯಾನೇಜರ್ WhatsApp ನಲ್ಲಿ ಕಳುಹಿಸಿದ ನಿಮ್ಮ ವೈಯಕ್ತಿಕ ಲಿಂಕ್ ತೆರೆಯಿರಿ. ಬಂದಿಲ್ಲದಿದ್ದರೆ, ಕಳುಹಿಸಲು ಅವರನ್ನು ಕೇಳಿ.',
     addPhoto: '📷 ಫೋಟೋ ಸೇರಿಸಿ (ಐಚ್ಛಿಕ)', photoAdded: 'ಫೋಟೋ ಸೇರಿಸಲಾಗಿದೆ ✓', removePhoto: 'ಫೋಟೋ ತೆಗೆದುಹಾಕಿ',
     photoFail: 'ಫೋಟೋ ಕಳುಹಿಸಲು ಆಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ ಅಥವಾ ಫೋಟೋ ಇಲ್ಲದೆ ಕಳುಹಿಸಿ.', st_not_real: 'ನಿಜವಾದ ಸಮಸ್ಯೆ ಅಲ್ಲ',
     probTitle: 'ನಿಮ್ಮ ಕೋಣೆಯಲ್ಲಿ ಸಮಸ್ಯೆ ಇದೆಯೇ?', probHelp: 'PG ಮ್ಯಾನೇಜರ್‌ಗೆ ತಿಳಿಸಿ. ಏನು ಸಮಸ್ಯೆ ಎಂದು ಆಯ್ಕೆಮಾಡಿ:',
@@ -217,6 +226,9 @@ const T = {
     ],
   },
   hi: {
+    phoneVerified: 'आपका फ़ोन सत्यापित हो गया ✓', reportOff: 'आपके लिए शिकायत दर्ज करना बंद है। कृपया अपने PG मैनेजर से बात करें।',
+    needLink: 'समस्या बताने के लिए, अपने PG मैनेजर द्वारा WhatsApp पर भेजा गया अपना निजी लिंक खोलें। अगर नहीं मिला, तो उनसे भेजने को कहें।',
+    useLinkTitle: 'अपना निजी लिंक खोलें', useLink: 'कृपया अपने PG मैनेजर द्वारा WhatsApp पर भेजा गया अपना निजी लिंक खोलें। अगर नहीं मिला, तो उनसे भेजने को कहें।',
     addPhoto: '📷 फ़ोटो जोड़ें (वैकल्पिक)', photoAdded: 'फ़ोटो जुड़ गई ✓', removePhoto: 'फ़ोटो हटाएँ',
     photoFail: 'फ़ोटो नहीं भेजी जा सकी। दोबारा कोशिश करें या बिना फ़ोटो भेजें।', st_not_real: 'असली समस्या नहीं',
     probTitle: 'आपके कमरे में कोई समस्या?', probHelp: 'PG मैनेजर को बताइए। क्या खराब है, चुनें:',
@@ -261,6 +273,7 @@ const LOCALE = { en: 'en-IN', te: 'te-IN', kn: 'kn-IN', hi: 'hi-IN' };
 const app = document.getElementById('app');
 const link = new URLSearchParams(location.search).get('p') || '';
 const storeKey = 'pgmeal_' + link;
+const invite = (new URLSearchParams(location.search).get('c') || '').trim();
 
 function store(k, v) { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch (e) {} }
 function read(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
@@ -352,7 +365,7 @@ async function showLogin(message) {
     app.innerHTML = '<div class="spinner" aria-label="Loading"></div>';
     try {
       const [rooms, info] = await Promise.all([rpc('vote_rooms', { p_link: link }), rpc('vote_note', { p_link: link })]);
-      loginData = { rooms, note: info && info.note };
+      loginData = { rooms, note: info && info.note, digits: !(info && info.digits === false) };
     } catch (e) {
       app.innerHTML = `${langBar()}<h1>${t('cantOpen')}</h1><div class="msg">${esc(e.message)}</div>`;
       wireLangBar(() => showLogin(message)); return;
@@ -362,6 +375,12 @@ async function showLogin(message) {
 }
 
 function renderLogin(message, keep) {
+  if (!loginData.digits) {
+    app.innerHTML = `${langBar()}<h1>${t('useLinkTitle')}</h1>
+      ${message ? `<div class="msg">${esc(message)}</div>` : ''}
+      <p class="sub">${t('useLink')}</p>${ownerTip(loginData.note)}`;
+    wireLangBar(() => renderLogin(message, keep)); return;
+  }
   const byRoom = {};
   loginData.rooms.forEach(r => { (byRoom[r.room_no] ||= { floor: r.floor, beds: [] }).beds.push(r.bed_label); });
   const floors = {};
@@ -414,6 +433,7 @@ function renderLogin(message, keep) {
 // ---------- Step 2: meals ----------
 let state = null;
 let issues = [];
+let status = { verified: false, can_report: true };   // is this phone verified by the personal link?
 let probCat = null;
 let probPhoto = null;   // { blob, url } after shrinking
 const CATS = ['leak', 'hot_water', 'no_water', 'electrical', 'cleaning', 'hygiene', 'pests', 'furniture', 'wifi', 'other'];
@@ -423,6 +443,7 @@ async function showMeals() {
   try { state = await rpc('vote_get', { p_token: token() }); }
   catch (e) { setToken(null); state = null; return showLogin(e.message); }
   try { issues = await rpc('vote_issues', { p_token: token() }); } catch (e) { issues = []; }
+  try { status = await rpc('vote_status', { p_token: token() }); } catch (e) { status = { verified: false, can_report: true }; }
   render();
 }
 
@@ -496,6 +517,13 @@ function problemCard() {
     : `<div class="photo-row"><button class="btn ghost small" id="probPhotoBtn">${t('addPhoto')}</button></div>`;
   const list = issues.length ? `<div style="margin-top:12px"><b>${t('yourReports')}</b>${issues.map(i =>
       `<div class="rep"><span>${esc(t('cat_' + i.category))} · ${esc(dayName(String(i.created_at).slice(0, 10), false))}</span>${pill(i.status)}</div>`).join('')}</div>` : '';
+  if (!status.verified || status.can_report === false) {
+    return `<section class="card" id="prob" aria-label="${t('probTitle')}">
+    <div class="day-head"><div class="day-title">🛠️ ${t('probTitle')}</div></div>
+    <p class="note" style="margin:6px 0 0">🔒 ${t(status.can_report === false ? 'reportOff' : 'needLink')}</p>
+    ${list}
+  </section>`;
+  }
   return `<section class="card" id="prob" aria-label="${t('probTitle')}">
     <div class="day-head"><div class="day-title">🛠️ ${t('probTitle')}</div></div>
     <p class="note" style="margin:6px 0 0">${t('probHelp')}</p>
@@ -509,6 +537,7 @@ function problemCard() {
 }
 
 function wireProblemCard() {
+  if (!document.getElementById('probSend')) return;
   app.querySelectorAll('#prob button[data-cat]').forEach(b => b.onclick = () => {
     probCat = b.dataset.cat;
     app.querySelectorAll('#prob button[data-cat]').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
@@ -590,7 +619,26 @@ async function uploadPhoto(blob) {
   return name;
 }
 
-showMeals();
+// Personal link (?c=CODE): claim it once, then remove the code from the address bar.
+async function start() {
+  if (link && invite) {
+    try { history.replaceState(null, '', location.pathname + '?p=' + encodeURIComponent(link)); } catch (e) {}
+    try {
+      const res = await rpc('vote_claim', { p_link: link, p_code: invite, p_device: deviceId });
+      if (res.ok) {
+        setToken(res.token); state = null;
+        await showMeals(); toast(t('phoneVerified')); return;
+      }
+      if (!token()) return showLogin(res.message);
+      // Already logged in on this phone (e.g. tapped the old link again): carry on; say why only if not verified.
+      await showMeals();
+      if (!status.verified) toast(res.message);
+      return;
+    } catch (e) { if (!token()) return showLogin(e.message); }
+  }
+  showMeals();
+}
+start();
 </script>
 </body>
 </html>
