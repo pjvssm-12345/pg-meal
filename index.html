@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#2F6B4F">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:; connect-src https://idowfsvjkbatqshkpimg.supabase.co; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data: blob:; connect-src https://idowfsvjkbatqshkpimg.supabase.co; base-uri 'none'; form-action 'none'">
 <title>PG Meals</title>
 <style>
   :root {
@@ -73,6 +73,9 @@
   textarea.t2 { width: 100%; box-sizing: border-box; font: inherit; font-size: 16px; min-height: 64px; padding: 10px 12px;
     border: 1px solid #B8C4BE; border-radius: 12px; margin-bottom: 10px; }
   .rep { display: flex; justify-content: space-between; gap: 8px; padding: 8px 0; border-top: 1px solid var(--line); font-size: 15px; }
+  .photo-row { display: flex; align-items: center; gap: 10px; margin: 0 0 10px; flex-wrap: wrap; }
+  .photo-row img { width: 64px; height: 64px; object-fit: cover; border-radius: 10px; border: 1px solid var(--line); }
+  .btn.small { width: auto; min-height: 40px; font-size: 15px; }
   .pill.red { background: var(--red-bg); color: var(--red); }
   .link { background: none; color: var(--muted); text-decoration: underline; min-height: 44px; padding: 0; font-size: 14px; }
   .center { text-align: center; }
@@ -97,6 +100,8 @@ const SUPABASE_KEY = 'sb_publishable_sA1wWWN3V3OysXAKAqL3ug_95wyHYEX';
 const LANGS = [['en', 'English'], ['te', 'తెలుగు'], ['kn', 'ಕನ್ನಡ'], ['hi', 'हिन्दी']];
 const T = {
   en: {
+    addPhoto: '📷 Add a photo (optional)', photoAdded: 'Photo added ✓', removePhoto: 'Remove photo',
+    photoFail: 'Photo could not be sent. Try again or send without the photo.', st_not_real: 'Not a real problem',
     probTitle: 'Problem in your room?', probHelp: 'Tell the PG manager. Choose what is wrong:',
     cat_leak: 'Water leak', cat_hot_water: 'No hot water', cat_no_water: 'No water', cat_electrical: 'Light / fan / plug',
     cat_cleaning: 'Room not cleaned', cat_hygiene: 'Hygiene / bathroom', cat_pests: 'Insects / rats',
@@ -134,6 +139,8 @@ const T = {
     ],
   },
   te: {
+    addPhoto: '📷 ఫోటో జోడించండి (ఐచ్ఛికం)', photoAdded: 'ఫోటో జోడించారు ✓', removePhoto: 'ఫోటో తీసివేయండి',
+    photoFail: 'ఫోటో పంపలేకపోయాం. మళ్లీ ప్రయత్నించండి లేదా ఫోటో లేకుండా పంపండి.', st_not_real: 'నిజమైన సమస్య కాదు',
     probTitle: 'మీ గదిలో సమస్య ఉందా?', probHelp: 'PG మేనేజర్‌కు తెలియజేయండి. ఏమి సమస్యో ఎంచుకోండి:',
     cat_leak: 'నీటి లీకేజీ', cat_hot_water: 'వేడి నీళ్లు రావట్లేదు', cat_no_water: 'నీళ్లు రావట్లేదు', cat_electrical: 'లైట్ / ఫ్యాన్ / ప్లగ్',
     cat_cleaning: 'గది శుభ్రం చేయలేదు', cat_hygiene: 'పరిశుభ్రత / బాత్రూమ్', cat_pests: 'పురుగులు / ఎలుకలు',
@@ -171,6 +178,8 @@ const T = {
     ],
   },
   kn: {
+    addPhoto: '📷 ಫೋಟೋ ಸೇರಿಸಿ (ಐಚ್ಛಿಕ)', photoAdded: 'ಫೋಟೋ ಸೇರಿಸಲಾಗಿದೆ ✓', removePhoto: 'ಫೋಟೋ ತೆಗೆದುಹಾಕಿ',
+    photoFail: 'ಫೋಟೋ ಕಳುಹಿಸಲು ಆಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ ಅಥವಾ ಫೋಟೋ ಇಲ್ಲದೆ ಕಳುಹಿಸಿ.', st_not_real: 'ನಿಜವಾದ ಸಮಸ್ಯೆ ಅಲ್ಲ',
     probTitle: 'ನಿಮ್ಮ ಕೋಣೆಯಲ್ಲಿ ಸಮಸ್ಯೆ ಇದೆಯೇ?', probHelp: 'PG ಮ್ಯಾನೇಜರ್‌ಗೆ ತಿಳಿಸಿ. ಏನು ಸಮಸ್ಯೆ ಎಂದು ಆಯ್ಕೆಮಾಡಿ:',
     cat_leak: 'ನೀರು ಸೋರಿಕೆ', cat_hot_water: 'ಬಿಸಿ ನೀರು ಬರುತ್ತಿಲ್ಲ', cat_no_water: 'ನೀರು ಬರುತ್ತಿಲ್ಲ', cat_electrical: 'ಲೈಟ್ / ಫ್ಯಾನ್ / ಪ್ಲಗ್',
     cat_cleaning: 'ಕೋಣೆ ಸ್ವಚ್ಛಗೊಳಿಸಿಲ್ಲ', cat_hygiene: 'ಸ್ವಚ್ಛತೆ / ಬಾತ್‌ರೂಮ್', cat_pests: 'ಕೀಟಗಳು / ಇಲಿಗಳು',
@@ -208,6 +217,8 @@ const T = {
     ],
   },
   hi: {
+    addPhoto: '📷 फ़ोटो जोड़ें (वैकल्पिक)', photoAdded: 'फ़ोटो जुड़ गई ✓', removePhoto: 'फ़ोटो हटाएँ',
+    photoFail: 'फ़ोटो नहीं भेजी जा सकी। दोबारा कोशिश करें या बिना फ़ोटो भेजें।', st_not_real: 'असली समस्या नहीं',
     probTitle: 'आपके कमरे में कोई समस्या?', probHelp: 'PG मैनेजर को बताइए। क्या खराब है, चुनें:',
     cat_leak: 'पानी का रिसाव', cat_hot_water: 'गरम पानी नहीं', cat_no_water: 'पानी नहीं आ रहा', cat_electrical: 'लाइट / पंखा / प्लग',
     cat_cleaning: 'कमरे की सफ़ाई नहीं हुई', cat_hygiene: 'साफ़-सफ़ाई / बाथरूम', cat_pests: 'कीड़े / चूहे',
@@ -404,6 +415,7 @@ function renderLogin(message, keep) {
 let state = null;
 let issues = [];
 let probCat = null;
+let probPhoto = null;   // { blob, url } after shrinking
 const CATS = ['leak', 'hot_water', 'no_water', 'electrical', 'cleaning', 'hygiene', 'pests', 'furniture', 'wifi', 'other'];
 async function showMeals() {
   if (!token()) return showLogin();
@@ -478,7 +490,10 @@ function render() {
 // ---------- Problem in the room (maintenance) ----------
 function problemCard() {
   const chips = CATS.map(c => `<button data-cat="${c}" aria-pressed="${probCat === c}">${t('cat_' + c)}</button>`).join('');
-  const pill = st => `<span class="pill ${st === 'fixed' ? 'ok' : st === 'in_progress' ? 'wait' : 'red'}">${t('st_' + st)}</span>`;
+  const pill = st => `<span class="pill ${st === 'fixed' ? 'ok' : st === 'in_progress' ? 'wait' : st === 'not_real' ? 'lock' : 'red'}">${t('st_' + st)}</span>`;
+  const photo = probPhoto
+    ? `<div class="photo-row"><img src="${probPhoto.url}" alt=""><span>${t('photoAdded')}</span><button class="link" id="probPhotoDel">${t('removePhoto')}</button></div>`
+    : `<div class="photo-row"><button class="btn ghost small" id="probPhotoBtn">${t('addPhoto')}</button></div>`;
   const list = issues.length ? `<div style="margin-top:12px"><b>${t('yourReports')}</b>${issues.map(i =>
       `<div class="rep"><span>${esc(t('cat_' + i.category))} · ${esc(dayName(String(i.created_at).slice(0, 10), false))}</span>${pill(i.status)}</div>`).join('')}</div>` : '';
   return `<section class="card" id="prob" aria-label="${t('probTitle')}">
@@ -486,6 +501,8 @@ function problemCard() {
     <p class="note" style="margin:6px 0 0">${t('probHelp')}</p>
     <div class="chips">${chips}</div>
     <textarea id="probNote" class="t2" maxlength="300" placeholder="${t('probNote')}"></textarea>
+    <input type="file" id="probFile" accept="image/*" capture="environment" hidden>
+    ${photo}
     <button class="btn all" id="probSend">${t('probSend')}</button>
     ${list}
   </section>`;
@@ -496,17 +513,81 @@ function wireProblemCard() {
     probCat = b.dataset.cat;
     app.querySelectorAll('#prob button[data-cat]').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
   });
+  const file = document.getElementById('probFile');
+  const pickBtn = document.getElementById('probPhotoBtn');
+  if (pickBtn) pickBtn.onclick = () => file.click();
+  const delBtn = document.getElementById('probPhotoDel');
+  if (delBtn) delBtn.onclick = () => { keepNote(); URL.revokeObjectURL(probPhoto.url); probPhoto = null; render(); };
+  file.onchange = async () => {
+    const f = file.files && file.files[0];
+    if (!f) return;
+    try {
+      const blob = await shrinkPhoto(f);
+      keepNote();
+      if (probPhoto) URL.revokeObjectURL(probPhoto.url);
+      probPhoto = { blob, url: URL.createObjectURL(blob) };
+      render();
+    } catch (e) { toast(t('photoFail')); }
+  };
   const send = document.getElementById('probSend');
   send.onclick = async () => {
     if (!probCat) { toast(t('probChoose')); return; }
     send.disabled = true;
+    let photoPath = null;
     try {
-      issues = await rpc('vote_report_issue', { p_token: token(), p_category: probCat, p_note: document.getElementById('probNote').value });
-      probCat = null;
+      if (probPhoto) {
+        try { photoPath = await uploadPhoto(probPhoto.blob); }
+        catch (e) { send.disabled = false; toast(t('photoFail')); return; }
+      }
+      issues = await rpc('vote_report_issue', { p_token: token(), p_category: probCat,
+        p_note: document.getElementById('probNote').value, p_photo_path: photoPath });
+      probCat = null; savedNote = '';
+      if (probPhoto) { URL.revokeObjectURL(probPhoto.url); probPhoto = null; }
       render();
       toast(t('probSent'));
     } catch (e) { send.disabled = false; toast(e.message); }
   };
+  const noteBox = document.getElementById('probNote');
+  if (savedNote) noteBox.value = savedNote;
+}
+
+let savedNote = '';
+function keepNote() { const n = document.getElementById('probNote'); if (n) savedNote = n.value; }
+
+// Make the photo small (longest side 1024 px, JPG) so it uploads fast on mobile data.
+function shrinkPhoto(file) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      const max = 1024, k = Math.min(1, max / Math.max(img.width, img.height));
+      const c = document.createElement('canvas');
+      c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(url);
+      const tryQ = q => c.toBlob(b => {
+        if (!b) return reject(new Error('photo'));
+        if (b.size > 280000 && q > 0.4) return tryQ(q - 0.15);
+        resolve(b);
+      }, 'image/jpeg', q);
+      tryQ(0.75);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('photo')); };
+    img.src = url;
+  });
+}
+
+// Upload into this phone's own private folder; returns the saved path.
+async function uploadPhoto(blob) {
+  const folder = await rpc('vote_photo_folder', { p_token: token() });
+  const name = `${folder}/${Date.now()}${Math.random().toString(36).slice(2, 8)}.jpg`;
+  const r = await fetch(`${SUPABASE_URL}/storage/v1/object/issue-photos/${name}`, {
+    method: 'POST',
+    headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'image/jpeg', 'x-upsert': 'false' },
+    body: blob,
+  });
+  if (!r.ok) throw new Error('upload ' + r.status);
+  return name;
 }
 
 showMeals();
