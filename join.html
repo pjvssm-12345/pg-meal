@@ -185,8 +185,11 @@ function photoBlock(kind) {
   const p = photos[kind];
   const label = kind === 'id' ? '📄 Photo of your ID' : '🤳 Take a selfie';
   return p ? `<div class="photo-row"><img class="big" src="${p.url}" alt=""><span>Added ✓</span>
-      <button class="link" data-retake="${kind}">Take again</button></div>`
-    : `<div class="photo-row"><button class="btn ghost small" data-pick="${kind}">${label}</button></div>`;
+      <button class="link" data-retake="${kind}">Change</button></div>`
+    : kind === 'id'
+      ? `<div class="photo-row"><button class="btn ghost small" data-pick="id">📷 Take photo of ID</button>
+           <button class="btn ghost small" data-pick="idGallery">🖼️ Choose from gallery</button></div>`
+      : `<div class="photo-row"><button class="btn ghost small" data-pick="${kind}">${label}</button></div>`;
 }
 
 function renderForm() {
@@ -226,6 +229,7 @@ function renderForm() {
       <div id="idBlock">${photoBlock('id')}</div>
       <div id="selfieBlock">${photoBlock('selfie')}</div>
       <input type="file" id="fileId" accept="image/*" capture="environment" hidden>
+      <input type="file" id="fileIdGallery" accept="image/*" hidden>
       <input type="file" id="fileSelfie" accept="image/*" capture="user" hidden>
     </section>
     <section class="card"><h2>4. House rules</h2>
@@ -245,21 +249,28 @@ function renderForm() {
 function wire() {
   const adult = document.getElementById('adult');
   adult.onchange = () => { document.getElementById('guardian').hidden = adult.value !== 'no'; };
-  const inputs = { id: document.getElementById('fileId'), selfie: document.getElementById('fileSelfie') };
+  const inputs = { id: document.getElementById('fileId'), idGallery: document.getElementById('fileIdGallery'),
+                   selfie: document.getElementById('fileSelfie') };
   const redraw = kind => { document.getElementById(kind + 'Block').innerHTML = photoBlock(kind); wirePhotos(); };
   function wirePhotos() {
-    app.querySelectorAll('[data-pick],[data-retake]').forEach(b => b.onclick = () => inputs[b.dataset.pick || b.dataset.retake].click());
+    app.querySelectorAll('[data-pick]').forEach(b => b.onclick = () => inputs[b.dataset.pick].click());
+    // "Change" on the ID: forget it and show both choices again (camera / gallery).
+    app.querySelectorAll('[data-retake]').forEach(b => b.onclick = () => {
+      const kind = b.dataset.retake;
+      if (kind === 'id') { URL.revokeObjectURL(photos.id.url); photos.id = null; redraw('id'); } else inputs[kind].click();
+    });
   }
-  for (const kind of ['id', 'selfie']) {
-    inputs[kind].onchange = async () => {
-      const f = inputs[kind].files && inputs[kind].files[0]; if (!f) return;
+  for (const key of ['id', 'idGallery', 'selfie']) {
+    const kind = key === 'idGallery' ? 'id' : key;
+    inputs[key].onchange = async () => {
+      const f = inputs[key].files && inputs[key].files[0]; if (!f) return;
       try {
         const blob = await shrinkPhoto(f);
         if (photos[kind]) URL.revokeObjectURL(photos[kind].url);
         photos[kind] = { blob, url: URL.createObjectURL(blob) };
         redraw(kind);
       } catch (e) { toast('This photo could not be read. Try again.'); }
-      inputs[kind].value = '';
+      inputs[key].value = '';
     };
   }
   wirePhotos();
