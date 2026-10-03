@@ -98,10 +98,37 @@
   a.btn { display: block; text-align: center; text-decoration: none; line-height: 28px; box-sizing: border-box; }
   .due { border-top: 1px solid var(--line); padding: 10px 0; } .due:first-of-type { border-top: 0; }
   .due .amt { font-size: 22px; font-weight: 800; color: var(--turmeric); }
+  /* ---- Polish (29 Sep): hero header, softer cards ---- */
+  body { background: linear-gradient(180deg, #E4EFE8 0, var(--bg) 280px) no-repeat, var(--bg); }
+  .card { border-color: #E3E9E5; border-radius: 16px; padding: 16px;
+    box-shadow: 0 1px 2px rgba(20,50,35,.05), 0 6px 18px rgba(20,50,35,.06); }
+  .btn { box-shadow: 0 2px 8px rgba(47,107,79,.22); transition: transform .08s, box-shadow .15s; }
+  .btn:active { transform: scale(.98); }
+  .btn.ghost, .btn.done, .btn:disabled { box-shadow: none; }
+  .hero { position: relative; overflow: hidden; color: #fff; border-radius: 20px; padding: 18px 18px 16px; margin: 8px 0 14px;
+    background: linear-gradient(135deg, #2F6B4F 0%, #1F4E3A 100%); box-shadow: 0 10px 26px rgba(31,78,58,.28); }
+  .hero::before { content: ""; position: absolute; right: -46px; top: -46px; width: 160px; height: 160px; border-radius: 50%;
+    background: rgba(255,255,255,.08); }
+  .hero::after { content: ""; position: absolute; right: 28px; bottom: -70px; width: 130px; height: 130px; border-radius: 50%;
+    background: rgba(255,255,255,.06); }
+  .hero > * { position: relative; z-index: 1; }
+  .hero .brand { font-size: 13px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; opacity: .9; }
+  .hero h1 { color: #fff; font-size: 26px; margin: 4px 0 10px; }
+  .hero .chips2 { display: flex; flex-wrap: wrap; gap: 8px; }
+  .hero .chip { background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.24); padding: 4px 12px;
+    border-radius: 999px; font-size: 14px; font-weight: 600; }
+  .due .pill { white-space: normal; }
+  .rep .pill { align-self: flex-start; height: fit-content; }
+  .foot { text-align: center; color: var(--muted); font-size: 12px; margin: 6px 0 0; }
+  .foot b { color: var(--leaf); }
+  .legal-links { max-width: 480px; margin: 4px auto 28px; text-align: center; font-size: 12px; color: var(--muted); }
+  .legal-links a { color: var(--muted); }
+  @media print { .legal-links { display: none; } }
 </style>
 </head>
 <body>
 <main id="app"><div class="spinner" aria-label="Loading"></div></main>
+<p class="legal-links noprint">Your data is safe with your PG · <a href="https://pjvssm-12345.github.io/pg-app/privacy.html" target="_blank" rel="noopener">Privacy Policy</a> · <a href="https://pjvssm-12345.github.io/pg-app/privacy.html#rights" target="_blank" rel="noopener">Your data rights</a></p>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
 <script>
@@ -136,7 +163,7 @@ const T = {
     fillAll: 'Choose your room and bed, and enter 4 digits.',
     ground: 'Ground floor', floor: 'Floor {n}',
     hi: 'Hi {name} 👋', room: 'Room',
-    howTo: 'Switch off meals you will skip, by {cutoff} the evening before.',
+    howTo: 'You can change only tomorrow\'s meals, until {cutoff} tonight.',
     todaysNote: "Today's note", ownerNote: 'Message from your PG',
     today: 'Today', locked: 'Locked', notStaying: 'Not staying', replied: 'Replied ✓', notReplied: 'Not replied yet',
     breakfast: 'Breakfast', lunch: 'Lunch', dinner: 'Dinner', eating: 'Eating', skipping: 'Skipping',
@@ -181,7 +208,7 @@ const T = {
     fillAll: 'గది, బెడ్ ఎంచుకుని, 4 అంకెలు నమోదు చేయండి.',
     ground: 'గ్రౌండ్ ఫ్లోర్', floor: 'ఫ్లోర్ {n}',
     hi: 'నమస్తే {name} 👋', room: 'గది',
-    howTo: 'మీరు తినని భోజనాన్ని ముందు రోజు సాయంత్రం {cutoff} లోపు ఆఫ్ చేయండి.',
+    howTo: 'రేపటి భోజనాలను మాత్రమే మార్చగలరు, ఈ రోజు రాత్రి {cutoff} లోపు.',
     todaysNote: 'నేటి సందేశం', ownerNote: 'మీ PG నుండి సందేశం',
     today: 'ఈరోజు', locked: 'లాక్ అయింది', notStaying: 'ఇక్కడ లేరు', replied: 'స్పందించారు ✓', notReplied: 'ఇంకా స్పందించలేదు',
     breakfast: 'టిఫిన్', lunch: 'మధ్యాహ్న భోజనం', dinner: 'రాత్రి భోజనం', eating: 'తింటాను', skipping: 'తినను',
@@ -226,7 +253,7 @@ const T = {
     fillAll: 'ಕೊಠಡಿ ಮತ್ತು ಬೆಡ್ ಆಯ್ಕೆಮಾಡಿ, 4 ಅಂಕೆಗಳನ್ನು ನಮೂದಿಸಿ.',
     ground: 'ನೆಲ ಮಹಡಿ', floor: 'ಮಹಡಿ {n}',
     hi: 'ನಮಸ್ಕಾರ {name} 👋', room: 'ಕೊಠಡಿ',
-    howTo: 'ನೀವು ಬಿಡುವ ಊಟವನ್ನು ಹಿಂದಿನ ದಿನ ಸಂಜೆ {cutoff} ಒಳಗೆ ಆಫ್ ಮಾಡಿ.',
+    howTo: 'ನಾಳೆಯ ಊಟವನ್ನು ಮಾತ್ರ ಬದಲಾಯಿಸಬಹುದು, ಇಂದು ರಾತ್ರಿ {cutoff} ಒಳಗೆ.',
     todaysNote: 'ಇಂದಿನ ಸಂದೇಶ', ownerNote: 'ನಿಮ್ಮ PG ಯಿಂದ ಸಂದೇಶ',
     today: 'ಇಂದು', locked: 'ಲಾಕ್ ಆಗಿದೆ', notStaying: 'ಇಲ್ಲಿ ಇರುವುದಿಲ್ಲ', replied: 'ಉತ್ತರಿಸಿದ್ದೀರಿ ✓', notReplied: 'ಇನ್ನೂ ಉತ್ತರಿಸಿಲ್ಲ',
     breakfast: 'ತಿಂಡಿ', lunch: 'ಮಧ್ಯಾಹ್ನದ ಊಟ', dinner: 'ರಾತ್ರಿ ಊಟ', eating: 'ಬೇಕು', skipping: 'ಬೇಡ',
@@ -271,7 +298,7 @@ const T = {
     fillAll: 'कमरा और बेड चुनें, और 4 अंक डालें।',
     ground: 'ग्राउंड फ़्लोर', floor: 'फ़्लोर {n}',
     hi: 'नमस्ते {name} 👋', room: 'कमरा',
-    howTo: 'जो खाना आप नहीं खाएँगे, उसे एक दिन पहले शाम {cutoff} तक बंद कर दें।',
+    howTo: 'आप केवल कल का खाना बदल सकते हैं, आज रात {cutoff} तक।',
     todaysNote: 'आज का संदेश', ownerNote: 'आपके PG की ओर से संदेश',
     today: 'आज', locked: 'बंद', notStaying: 'यहाँ नहीं हैं', replied: 'जवाब दिया ✓', notReplied: 'अभी जवाब नहीं दिया',
     breakfast: 'नाश्ता', lunch: 'दोपहर का खाना', dinner: 'रात का खाना', eating: 'खाएँगे', skipping: 'नहीं खाएँगे',
@@ -338,6 +365,18 @@ if (!deviceId) {
 let memToken = null; // fallback when the browser blocks storage
 const token = () => read(storeKey) || memToken;
 function setToken(v) { store(storeKey, v); memToken = v; }
+
+// Monitoring: report page crashes to app_errors (update_031). Page path only, no personal data.
+function logErr(m, d) {
+  try {
+    fetch(`${SUPABASE_URL}/rest/v1/rpc/log_error`, { method: 'POST',
+      headers: { apikey: SUPABASE_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ p_source: 'meal', p_message: String(m || '?').slice(0, 500),
+        p_detail: String(d || '').slice(0, 2000), p_page: location.pathname }) }).catch(() => {});
+  } catch (e) {}
+}
+window.addEventListener('error', e => logErr(e.message, (e.filename || '') + ':' + (e.lineno || '')));
+window.addEventListener('unhandledrejection', e => logErr(e.reason && e.reason.message || e.reason, e.reason && e.reason.stack));
 
 async function rpc(fn, body) {
   let r;
@@ -521,16 +560,22 @@ function render() {
   }).join('');
   app.innerHTML = `
     ${langBar()}
-    <h1>${t('hi', { name: esc(s.name) })}</h1>
-    <p class="sub">${esc(s.pg_name)} · ${t('room')} ${esc(s.room)}-${esc(s.bed)}<br>
-      ${t('howTo', { cutoff: `<b>${esc(s.cutoff)}</b>` })}</p>
+    <header class="hero">
+      <div class="brand">🏠 ${esc(s.pg_name)}</div>
+      <h1>${t('hi', { name: esc(s.name) })}</h1>
+      <div class="chips2"><span class="chip">🛏️ ${t('room')} ${esc(s.room)}-${esc(s.bed)}</span>
+        <span class="chip">📅 ${new Date().toLocaleDateString(LOCALE[lang] || 'en-IN', { weekday: 'short', day: 'numeric', month: 'short' })}</span></div>
+    </header>
+    <p class="sub">${t('howTo', { cutoff: `<b>${esc(s.cutoff)}</b>` })}</p>
     ${noticesCard()}
     ${ownerTip(s.note)}
     ${rentCard()}
     ${todayTip()}
     ${days}
     ${problemCard()}
-    <p class="center"><button class="link" id="notme">${t('notMe', { name: esc(s.name) })}</button></p>`;
+    <p class="center"><button class="link" id="notme">${t('notMe', { name: esc(s.name) })}</button></p>
+    <p class="foot">${esc(s.pg_name)} · powered by <b>PG Manager</b></p>`;
+  document.title = s.pg_name;
   wireLangBar(render);
 
   app.querySelectorAll('input[type=checkbox]').forEach(el => el.onchange = async () => {
@@ -763,8 +808,10 @@ function showCounterPoster() {
     <p class="noprint"><button class="btn" onclick="print()">🖨️ Print this poster</button></p></div>`;
   const sc = document.createElement('script');
   sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js';
+  sc.integrity = 'sha512-ZDSPMa/JM1D+7kdg2x3BsruQ6T/JpJo3jWDWkCZsP+5yVyp1KfESqLI+7RqB5k24F7p2cV7i2YHh/890y6P6Sw=='; sc.crossOrigin = 'anonymous';  // refuse the script if cdnjs ever changes it
   sc.onload = () => { const q = qrcode(0, 'M'); q.addData(url); q.make();
     document.getElementById('qr').innerHTML = q.createSvgTag({ cellSize: 8, margin: 2, scalable: true }); };
+  sc.onerror = () => { document.getElementById('qr').innerHTML = `<p class="msg">QR could not load. Link: ${esc(url)}</p>`; };
   document.head.appendChild(sc);
 }
 
