@@ -424,8 +424,9 @@ document.documentElement.lang = lang;
 function todayTip() {
   const now = new Date();
   const dayNo = Math.floor(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) / 86400000);
+  const slot = now.getHours() < 12 ? 0 : now.getHours() < 17 ? 1 : 2;  // morning / afternoon / evening
   const tips = t('tips');
-  const [ico, text] = tips[dayNo % tips.length];
+  const [ico, text] = tips[(dayNo * 3 + slot) % tips.length];
   return `<div class="tip daily" role="note"><div class="ico" aria-hidden="true">${ico}</div>
     <div><b>${t('todaysNote')}</b><p>${esc(text)}</p></div></div>`;
 }
